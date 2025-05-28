@@ -1,10 +1,5 @@
-#include "comum.h"
-#include "Utils/utils.h"
-#include "Evento/evento.h"
-#include "Participantes/participantes.h"
-#include "Inscricoes/inscricoes.h"
-#include "FilaPilha/filaPilha.h"
-#include "persist.h"
+#include "Persistencia/persist.h" // Inclui o cabeçalho do próprio módulo
+#include "Evento/eventos.h"   
 // --- Funções de Salvamento ---
 
 void salvarEventosCSV() {
