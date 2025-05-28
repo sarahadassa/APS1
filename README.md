@@ -19,7 +19,7 @@ O sistema oferece as seguintes funcionalidades principais:
 
 ## 📁 Estrutura do Projeto
 
-O projeto segue uma estrutura modular para facilitar a leitura, manutenção e escalabilidade, dividindo as funcionalidades em diretórios e pares de arquivos `.h` (cabeçalho) e `.c` (implementação).
+O projeto segue uma estrutura modular para facilitar a leitura, manutenção e escalabilidade, dividindo as funcionalidades em diretórios e pares de arquivos `.h` e `.c`.
 
 
 ├── src/
@@ -62,41 +62,20 @@ Para compilar este projeto, você precisará de um compilador C (como o GCC).
 
 2.  **Execute o seguinte comando no terminal:**
 
-    ```bash
-    gcc src/main.c \
-        src/Utils/utils.c \
-        src/Evento/eventos.c \
-        src/Participantes/participantes.c \
-        src/Inscricoes/inscricoes.c \
-        src/FilaPilha/filaPilha.c \
-        src/Persistencia/persist.c \
-        -Isrc \
-        -Isrc/Utils \
-        -Isrc/Evento \
-        -Isrc/Participantes \
-        -Isrc/Inscricoes \
-        -Isrc/FilaPilha \
-        -Isrc/Persistencia \
-        -o sistema_eventos
-    ```
-
-    * `gcc`: O compilador C.
-    * `src/*.c`: Lista todos os arquivos de implementação `.c` para serem compilados e linkados.
-    * `-Isrc`, `-Isrc/Utils`, etc.: Indicam ao compilador os diretórios onde ele deve procurar por arquivos de cabeçalho (`.h`).
-    * `-o sistema_eventos`: Define o nome do executável de saída como `sistema_eventos`.
+gcc src/main.c src/Utils/utils.c src/Evento/eventos.c src/Participantes/participantes.c src/Inscricoes/inscricoes.c src/FilaPilha/filaPilha.c src/Persistencia/persist.c -I"src" -I"src/Utils" -I"src/Evento" -I"src/Participantes" -I"src/Inscricoes" -I"src/FilaPilha" -I"src/Persistencia" -o sistema_eventos
 
 ## ▶️ Como Executar
 
 Após a compilação bem-sucedida:
 
 * **No Linux/macOS:**
-    ```bash
+
     ./sistema_eventos
-    ```
+
 * **No Windows:**
-    ```bash
+
     .\sistema_eventos.exe
-    ```
+
 
 ## 🔑 Acesso Administrativo
 
@@ -107,5 +86,4 @@ A senha padrão de administrador é: `admin123`
 * Ocultar a digitação da senha no `menuAdmin` (função `_getch()`) é nativa do Windows (`conio.h`). Em sistemas Unix-like (Linux/macOS), a senha será visível a menos que sejam usadas bibliotecas como `termios.h` para controle de terminal.
 * Este projeto é uma prática de Estruturas de Dados. Algumas implementações (como a estratégia de colisão da Hash Table) são simplificadas para fins didáticos.
 
----
 

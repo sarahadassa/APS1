@@ -1,12 +1,4 @@
-#include "comum.h"
-#include "utils.h"
-#include "Evento/evento.h"
-#include "Participantes/participantes.h"
-#include "Inscricoes/inscricoes.h"
-#include "FilaPilha/filaPilha.h"
-#include "Persistencia/persist.h"
-
-// Implementação da função para limpar o buffer de entrada
+#include "Utils/utils.h"
 void limparBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);

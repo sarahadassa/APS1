@@ -2,7 +2,7 @@
 #ifndef FILA_PILHA_H
 #define FILA_PILHA_H
 
-#include "comum.h" // Para as structs e variáveis globais
+#include "comum.h" 
 
 // Protótipos das funções da Fila de Espera
 void insereFilaEspera(Evento *e, Part *p);

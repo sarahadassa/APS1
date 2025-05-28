@@ -1,10 +1,6 @@
-#include "comum.h"
-#include "Utils/utils.h"
-#include "Evento/evento.h"
-#include "Participantes/participantes.h"
-#include "Inscricoes/inscricoes.h"
-#include "filaPilha.h"
-#include "Persistencia/persist.h"
+// FilaPilha/filaPilha.c
+#include "FilaPilha/filaPilha.h" // Inclui os protótipos do próprio módulo
+#include "Evento/eventos.h"    // Necessário para acessar a variável global 'eventos' na função listarFilaEspera
 
 // Implementação da função para inserir um participante na fila de espera
 void insereFilaEspera(Evento *e, Part *p) {

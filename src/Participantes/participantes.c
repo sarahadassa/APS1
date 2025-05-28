@@ -1,10 +1,6 @@
-#include "comum.h"
-#include "Utils/utils.h"
-#include "Evento/evento.h"
-#include "participantes.h"
-#include "Inscricoes/inscricoes.h"
-#include "FilaPilha/filaPilha.h"
-#include "Persistencia/persist.h"
+// Participantes/participantes.c
+#include "Participantes/participantes.h" // Inclui o cabeçalho do próprio módulo
+#include "Utils/utils.h"                // Necessário para validarEmail e limparBuffer
 
 // Implementação da função de hash para emails de participantes
 int hashParticipante(char *email) {
@@ -14,37 +10,49 @@ int hashParticipante(char *email) {
 }
 
 // Implementação da busca de participante na hash table por email
-// Esta função é uma adaptação e simplificação da sua lógica de busca na hash
-// O código original tinha a lógica de busca dentro de insereParticipante.
-// Esta função visa encapsular a busca na hash.
 Part* buscaParticipantePorEmailNaHash(char *email) {
     if (!email || strlen(email) == 0) {
         return NULL;
     }
     int index = hashParticipante(email);
-    // Para colisões simples onde você sobrescreve ou espera que seja o mesmo email
     if (hash_table[index] != NULL && strcmp(hash_table[index]->email, email) == 0) {
         return hash_table[index];
     }
     return NULL; // Participante não encontrado ou colisão não tratada para este email
 }
 
-/*
-    A função original 'int buscaParticipante(Part *lista, char *email)'
-    que você tinha no main.c era para buscar em uma *lista encadeada*,
-    não na hash table global. Essa função é mais relevante para
-    buscar na lista circular de participantes de um Evento.
-    Vamos realocá-la para o módulo de inscrições onde ela será usada
-    em 'insereParticipante' ao verificar se o participante já está inscrito
-    em um evento específico.
-*/
+// Implementação da função para obter um participante existente ou criar um novo
+Part* obterOuCriarParticipante(char *email_usuario) {
+    int index = hashParticipante(email_usuario);
+    Part *p = NULL;
 
-// int buscaParticipante(Part *lista, char *email) {
-//     if (!lista) return 0;
-//     Part *atual = lista;
-//     do {
-//         if (strcmp(atual->email, email) == 0) return 1;
-//         atual = atual->prox;
-//     } while (atual != lista);
-//     return 0;
-// }
+    // Tenta encontrar o participante na hash table
+    if (hash_table[index] != NULL && strcmp(hash_table[index]->email, email_usuario) == 0) {
+        p = hash_table[index];
+        printf(YELLOW "Usando cadastro existente para %s (ID: %d)\n" RESET, p->email, p->id);
+    } else {
+        // Participante não encontrado na hash ou colisão não tratada, cria um novo
+        p = malloc(sizeof(Part));
+        if (!p) {
+            printf(RED "Erro de alocacao para novo participante!\n" RESET);
+            return NULL;
+        }
+        p->id = next_part_id++;
+        strcpy(p->email, email_usuario);
+        printf("Digite seu nome: ");
+        scanf(" %[^\n]", p->nome);
+        limparBuffer(); // Usa a função de utils.h
+        p->prox = NULL; // Importante para a hash table ou lista circular
+
+        // Adiciona/sobrescreve o novo participante na hash table
+        if (hash_table[index] != NULL) {
+            // Se houver uma colisão (email diferente), libere o antigo antes de sobrescrever
+            // ATENÇÃO: Essa é uma política de colisão muito simples (sobrescrever).
+            // Para um sistema mais robusto, você implementaria encadeamento separado (lista de colisões).
+            printf(YELLOW "Colisao de hash detectada para %s. Participante anterior sera substituido.\n" RESET, hash_table[index]->email);
+            free(hash_table[index]);
+        }
+        hash_table[index] = p;
+    }
+    return p;
+}

@@ -1,10 +1,6 @@
-#include "comum.h"
-#include "Utils/utils.h"
-#include "evento.h"
-#include "Participantes/participantes.h"
-#include "Inscricoes/inscricoes.h"
-#include "FilaPilha/filaPilha.h"
-#include "Persistencia/persist.h"
+#include "Evento/eventos.h" // Inclui os protótipos do próprio módulo
+#include "Utils/utils.h"    // Para usar limparBuffer()
+
 // Implementação da função para cadastrar um novo evento
 void cadastrarEvento() {
     if (total_eventos >= MAX_EVENTOS) {
@@ -163,7 +159,6 @@ void mergeSort(Evento **headRef) {
     // Une as duas sublistas ordenadas
     *headRef = merge(a, b);
 }
-
 
 // Implementação da função para atualizar o índice de busca por nome
 void atualizarIndice() {
