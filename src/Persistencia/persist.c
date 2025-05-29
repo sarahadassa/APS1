@@ -84,8 +84,8 @@ void carregarEventosCSV() {
         // Adaptação para o caso de o CSV não ter max_vagas no passado
         int campos_lidos = sscanf(linha, "%d,%49[^,],%49[^,],%d,%d",
                                   &novo->id, novo->nome, novo->categoria, &novo->vagas, &novo->max_vagas);
-        if (campos_lidos < 4) { // Pelo menos ID, Nome, Categoria, Vagas
-            printf(RED "Erro ao ler linha de evento: %s\n" RESET, linha);
+        if (campos_lidos < 4) {
+            // printf(RED "Erro ao ler linha de evento: %s\n" RESET, linha);
             free(novo);
             continue;
         }
@@ -280,7 +280,6 @@ void carregarTudoCSV() {
     carregarInscricoesCSV();
     carregarFilaEsperaCSV();
     atualizarIndice(); // Atualiza o índice de eventos após o carregamento
-    printf(GREEN "Dados carregados dos arquivos CSV!\n" RESET);
 }
 
 // Implementação da função para liberar toda a memória alocada
@@ -291,16 +290,9 @@ void liberarMemoria() {
         Evento *temp_e = e;
         e = e->prox;
 
-        // Libera a lista circular de participantes de cada evento
-        // Cuidado: não liberar os Participantes em si, pois eles estão na hash_table.
-        // Apenas "desconecta" a lista circular do evento.
         if (temp_e->participantes != NULL) {
-            // Para lista circular com um elemento, ele aponta para si mesmo.
-            // Para múltiplos, o último aponta para o primeiro.
-            // Basta quebrar a circularidade para um loop normal.
-            temp_e->participantes->prox = NULL; // Quebra o ciclo no "tail"
-            // Não precisamos percorrer e free cada participante aqui, pois eles são
-            // gerenciados globalmente pela hash_table e serão liberados por ela.
+
+            temp_e->participantes->prox = NULL;
         }
         free(temp_e); // Libera o nó do evento
     }

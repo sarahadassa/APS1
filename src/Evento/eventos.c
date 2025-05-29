@@ -1,5 +1,5 @@
-#include "Evento/eventos.h" // Inclui os protótipos do próprio módulo
-#include "Utils/utils.h"    // Para usar limparBuffer()
+#include "Evento/eventos.h"
+#include "Utils/utils.h"
 
 // Implementação da função para cadastrar um novo evento
 void cadastrarEvento() {
@@ -13,8 +13,7 @@ void cadastrarEvento() {
     scanf(" %[^\n]", nome_evento);
     limparBuffer();
 
-    // Verifica se já existe um evento com o mesmo nome
-    // Usa buscaIndexada para uma busca mais rápida (se o índice estiver atualizado)
+
     Evento *e_existente = buscaIndexada(nome_evento);
     if (!e_existente) { // Se não encontrou no índice, tenta na lista linear (fallback)
         e_existente = eventos;

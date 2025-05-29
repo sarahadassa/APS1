@@ -1,4 +1,3 @@
-// comum.h
 #ifndef COMUM_H
 #define COMUM_H
 
@@ -24,55 +23,50 @@
 #define RESET   "\033[0m"
 
 // Tamanhos máximos e valores de sistema
-#define MAX 50 // Tamanho máximo para nomes, categorias, emails, etc.
-#define MAX_EVENTOS 100 // Número máximo de eventos (se usarmos array estático para índice)
-#define HASH_SIZE 100 // Tamanho da tabela hash de participantes
-#define ADMIN_PASS "admin123" // Senha do administrador
-#define VAGAS_POR_EVENTO 3 // Vagas padrão para novos eventos
+#define MAX 50
+#define MAX_EVENTOS 100
+#define HASH_SIZE 100
+#define ADMIN_PASS "admin123"
+#define VAGAS_POR_EVENTO 3
 
-// --- Definições das Estruturas de Dados ---
-
+// --- Estruturas de Dados ---
 typedef struct Participante {
     int id;
     char nome[MAX];
     char email[MAX];
-    struct Participante *prox; // Próximo na lista circular do evento
-                               // ou próximo na lista de colisão da hash table
+    struct Participante *prox;
 } Part;
 
 typedef struct Inscricao {
     int evento_id;
     int participante_id;
-    char nome_participante[MAX]; // Armazena nome e email para facilitar relatórios
+    char nome_participante[MAX];
     char email_participante[MAX];
     struct Inscricao *prox;
 } Inscricao;
 
 typedef struct Evento {
     int id;
-    int vagas; // Vagas restantes
-    int max_vagas; // Vagas totais
+    int vagas;
+    int max_vagas;
     char nome[MAX];
     char categoria[MAX];
-    Part *participantes; // Lista circular de participantes inscritos no evento
-    struct Evento *prox; // Próximo evento na lista de eventos
+    Part *participantes;
+    struct Evento *prox;
 } Evento;
 
 typedef struct FilaEspera {
-    Part *participante; // Ponteiro para o participante na fila
-    int evento_id;      // ID do evento para o qual o participante está esperando
+    Part *participante;
+    int evento_id;
     struct FilaEspera *prox;
 } FilaEspera;
 
 typedef struct PilhaEventos {
-    Evento *evento; // Ponteiro para o evento na pilha
+    Evento *evento;
     struct PilhaEventos *prox;
 } PilhaEventos;
 
-// --- Variáveis globais (declaradas como extern, definidas em um .c) ---
-// Usar extern aqui significa que a variável será definida em algum outro lugar.
-// Isso evita múltiplos símbolos na linkagem.
-
+// --- Variáveis globais ---
 extern Evento *eventos;
 extern Inscricao *todas_inscricoes;
 extern FilaEspera *inicio_fila, *fim_fila;
@@ -81,7 +75,11 @@ extern PilhaEventos *topo_pilha;
 extern int next_evento_id;
 extern int next_part_id;
 extern int total_eventos;
-extern Evento **indice_nome; // Para busca indexada
-extern int total_indice;     // Tamanho atual do índice
+extern Evento **indice_nome;
+extern int total_indice;
+
+// Protótipos de funções essenciais (opcional)
+void inicializarHashParticipantes();
+bool validarEmail(const char *email);
 
 #endif // COMUM_H

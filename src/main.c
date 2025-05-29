@@ -1,4 +1,3 @@
-// main.c
 #include "comum.h"
 #include "Utils/utils.h"
 #include "Evento/eventos.h" // Corrigido para "eventos.h" se for esse o nome do arquivo
@@ -6,6 +5,7 @@
 #include "Inscricoes/inscricoes.h"
 #include "FilaPilha/filaPilha.h" // Corrigido para "filaPilha.h" se for esse o nome
 #include "Persistencia/persist.h" // Corrigido para "persist.h" se for esse o nome
+
 
 // Variáveis globais (DEFINIDAS aqui, declaradas como extern em comum.h)
 Evento *eventos = NULL;
@@ -17,7 +17,7 @@ int next_evento_id = 1, next_part_id = 1, total_eventos = 0;
 Evento **indice_nome = NULL; // Para busca indexada
 int total_indice = 0; // Tamanho atual do índice
 
-// Protótipos das funções que ficarão em main.c
+// Protótipos das funções locais
 void menuUsuario();
 void menuAdmin();
 
@@ -27,15 +27,14 @@ void menuUsuario() {
     char email_usuario[MAX];
 
     printf("\nDigite seu email para identificacao: ");
-    scanf(" %[^\n]", email_usuario);
-    limparBuffer();
-
+    obterStringSegura(email_usuario, MAX, "");
+    
     while (!validarEmail(email_usuario)) {
         printf(RED "Email invalido! Digite novamente: " RESET);
-        scanf(" %[^\n]", email_usuario);
-        limparBuffer();
+        obterStringSegura(email_usuario, MAX, "");
     }
 
+    // Exibe apenas a parte antes do @ no menu
     char email_display[MAX];
     char *arroba = strchr(email_usuario, '@');
     if (arroba) {
@@ -50,8 +49,10 @@ void menuUsuario() {
         printf("1. Listar Eventos Disponiveis\n");
         printf("2. Inscrever-se em Evento\n");
         printf("3. Remover Minha Inscricao\n");
+        printf("4. Listar Minhas Inscricoes\n");
         printf("0. Voltar\n");
         printf(CYAN "Opcao: " RESET);
+        
         if(scanf("%d", &op) != 1) {
             limparBuffer();
             printf(RED "\nEntrada invalida! Por favor, digite um numero.\n" RESET);
@@ -61,26 +62,25 @@ void menuUsuario() {
 
         switch (op) {
             case 1:
-                listarEventos(); // Chama a função do módulo Eventos
+                listarEventos();
                 break;
             case 2: {
                 if (!eventos) {
                     printf("\n" YELLOW "Nenhum evento cadastrado ainda!\n" RESET);
                     break;
                 }
+                
                 printf("\n" BLUE "=== EVENTOS DISPONIVEIS ===\n" RESET);
-                listarEventos(); // Reutiliza a função de listar eventos
+                listarEventos();
 
                 char nome_evento[MAX];
                 printf("\nNome do evento: ");
-                scanf(" %[^\n]", nome_evento);
-                limparBuffer();
+                obterStringSegura(nome_evento, MAX, "");
 
-                Evento *e = buscaIndexada(nome_evento); // Chama a função do módulo Eventos
-                // Se a busca indexada falhou, tenta uma busca linear simples
+                Evento *e = buscaIndexada(nome_evento);
                 if (!e) {
                     e = eventos;
-                    while(e != NULL && strcmp(e->nome, nome_evento) != 0) {
+                    while(e && strcmp(e->nome, nome_evento) != 0) {
                         e = e->prox;
                     }
                 }
@@ -90,24 +90,17 @@ void menuUsuario() {
                     break;
                 }
 
-                // Verifica se o participante já está inscrito neste evento
-                if (e->participantes && buscaParticipanteEmEvento(e->participantes, email_usuario)) {
-                    printf(RED "\nVoce ja esta inscrito neste evento!\n" RESET);
-                    break;
-                }
-
-                // Obtém ou cria o participante (nova função no módulo Participantes)
                 Part *p = obterOuCriarParticipante(email_usuario);
-                if (!p) {
-                    printf(RED "Erro ao obter/criar participante!\n" RESET);
-                    break;
+                if (p) {
+                    insereParticipante(e, p);
                 }
-
-                insereParticipante(e, p); // Chama a função do módulo Inscricoes
                 break;
             }
             case 3:
-                removerInscricaoUsuario(email_usuario); // Chama a função do módulo Inscricoes
+                removerInscricaoUsuario(email_usuario);
+                break;
+            case 4:
+                listarMinhasInscricoes(email_usuario);
                 break;
             case 0:
                 return;
@@ -120,55 +113,24 @@ void menuUsuario() {
 // Implementação do menu de administrador
 void menuAdmin() {
     char senha[MAX];
-    int i = 0;
-    char ch;
-
     int tentativas = 0;
     const int MAX_TENTATIVAS = 3;
 
     while (tentativas < MAX_TENTATIVAS) {
         printf("\nDigite a senha de administrador: ");
-        i = 0;
-        #ifdef _WIN32
-        while ((ch = _getch()) != '\r' && i < MAX - 1) {
-        #else // Para Linux/macOS
-        // Para uma solução mais robusta em Linux/macOS, você precisaria de termios.h
-        // e desabilitar o eco do terminal. Por simplicidade, usaremos getchar()
-        // mas a senha será visível.
-        while ((ch = getchar()) != '\n' && i < MAX - 1) {
-            if (ch == 127 || ch == '\b') { // Backspace (ASCII 127 ou '\b')
-                 if (i > 0) {
-                    i--;
-                    printf("\b \b");
-                }
-            } else {
-                senha[i++] = ch;
-                printf("*");
-            }
-        }
-        #endif
-            if (ch == '\b') {
-                if (i > 0) {
-                    i--;
-                    printf("\b \b");
-                }
-            } else if (isprint(ch)) {
-                senha[i++] = ch;
-                printf("*");
-            }
-        }
-        senha[i] = '\0';
-        printf("\n");
+        lerSenha(senha, MAX);  // Função segura para ler senha
 
-        if (autenticarAdmin(senha)) { // Chama a função do módulo Utils
+        if (autenticarAdmin(senha)) {
             break;
-        } else {
-            tentativas++;
-            printf(RED "\nSenha incorreta! Tentativas restantes: %d\n" RESET, MAX_TENTATIVAS - tentativas);
-            if (tentativas >= MAX_TENTATIVAS) {
-                printf(RED "Numero maximo de tentativas atingido. Acesso negado.\n" RESET);
-                return;
-            }
+        }
+        
+        tentativas++;
+        printf(RED "\nSenha incorreta! Tentativas restantes: %d\n" RESET, 
+              MAX_TENTATIVAS - tentativas);
+        
+        if (tentativas >= MAX_TENTATIVAS) {
+            printf(RED "Acesso negado.\n" RESET);
+            return;
         }
     }
 
@@ -182,63 +144,69 @@ void menuAdmin() {
         printf("5. Remover Inscricao Especifica\n");
         printf("6. Buscar Evento por Nome\n");
         printf("7. Listar Historico\n");
+        printf("8. Ordenar Eventos\n");
         printf("0. Voltar\n");
         printf(CYAN "Opcao: " RESET);
+        
         if(scanf("%d", &op) != 1) {
             limparBuffer();
-            printf(RED "\nEntrada invalida! Por favor, digite um numero.\n" RESET);
+            printf(RED "\nEntrada invalida!\n" RESET);
             continue;
         }
         limparBuffer();
 
         switch (op) {
             case 1:
-                cadastrarEvento(); // Chama a função do módulo Eventos
+                cadastrarEvento();
                 break;
             case 2:
-                listarEventos(); // Chama a função do módulo Eventos
+                listarEventos();
                 break;
             case 3:
-                listarTodasInscricoes(); // Chama a função do módulo Inscricoes
+                listarTodasInscricoes();
                 break;
             case 4:
-                listarFilaEspera(); // Chama a função do módulo FilaPilha
+                listarFilaEspera();
                 break;
-            case 5: {
-                adminRemoverInscricaoEspecifica(); // Chama a função do módulo Inscricoes
+            case 5:
+                adminRemoverInscricaoEspecifica();
                 break;
-            }
             case 6: {
                 char nome_busca[MAX];
                 printf("\nDigite o nome do evento: ");
-                scanf(" %[^\n]", nome_busca);
-                limparBuffer();
-                Evento *e = buscaIndexada(nome_busca); // Chama a função do módulo Eventos
-                // A função buscaIndexada já deve ter a lógica de fallback se necessário
+                obterStringSegura(nome_busca, MAX, "");
+                Evento *e = buscaIndexada(nome_busca);
+                
                 if (e) {
                     printf(GREEN "\nEvento encontrado:\n" RESET);
                     printf("Nome: %s\n", e->nome);
                     printf("Categoria: %s\n", e->categoria);
-                    printf("Vagas disponiveis: %d/%d\n", e->vagas, e->max_vagas);
+                    printf("Vagas: %d/%d\n", e->max_vagas - e->vagas, e->max_vagas);
                 } else {
                     printf(RED "\nEvento nao encontrado!\n" RESET);
                 }
                 break;
             }
             case 7:
-                listarPilhaEventos(); // Chama a função do módulo FilaPilha
+                listarPilhaEventos();
+                break;
+            case 8:
+                mergeSort(&eventos);
+                printf(GREEN "Eventos ordenados com sucesso!\n" RESET);
                 break;
             case 0:
                 return;
             default:
-                printf("\n" RED "Opcao invalida!\n" RESET);
+                printf(RED "Opcao invalida!\n" RESET);
         }
     }
 }
 
-// Função principal do programa
+// Função principal
 int main() {
-    carregarTudoCSV(); // Chama a função do módulo Persistencia
+    // Inicializa sistema
+    inicializarHashParticipantes();
+    carregarTudoCSV();
 
     int op;
     while (1) {
@@ -247,12 +215,14 @@ int main() {
         printf("2. Sou Administrador\n");
         printf("0. Sair\n");
         printf(CYAN "Opcao: " RESET);
+        
         if(scanf("%d", &op) != 1) {
             limparBuffer();
-            printf(RED "\nEntrada invalida! Por favor, digite um numero.\n" RESET);
+            printf(RED "\nEntrada invalida!\n" RESET);
             continue;
         }
         limparBuffer();
+
         switch (op) {
             case 1:
                 menuUsuario();
@@ -261,12 +231,12 @@ int main() {
                 menuAdmin();
                 break;
             case 0:
-                salvarTudoCSV(); // Chama a função do módulo Persistencia
-                liberarMemoria(); // Chama a função do módulo Persistencia
+                salvarTudoCSV();
+                liberarMemoria();
                 printf(GREEN "Sistema encerrado!\n" RESET);
                 return 0;
             default:
-                printf("\n" RED "Opcao invalida!\n" RESET);
+                printf(RED "Opcao invalida!\n" RESET);
         }
     }
 }
