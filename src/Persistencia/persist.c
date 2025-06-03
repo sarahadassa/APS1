@@ -3,7 +3,7 @@
 // --- Funções de Salvamento ---
 
 void salvarEventosCSV() {
-    FILE *file = fopen("eventos.csv", "w");
+    FILE *file = fopen("data/eventos.csv", "w");
     if (!file) {
         printf(RED "Erro ao salvar eventos!\n" RESET);
         return;
@@ -16,7 +16,7 @@ void salvarEventosCSV() {
 }
 
 void salvarParticipantesCSV() {
-    FILE *file = fopen("participantes.csv", "w");
+    FILE *file = fopen("data/participantes.csv", "w");
     if (!file) {
         printf(RED "Erro ao salvar participantes!\n" RESET);
         return;
@@ -31,7 +31,7 @@ void salvarParticipantesCSV() {
 }
 
 void salvarInscricoesCSV() {
-    FILE *file = fopen("inscricoes.csv", "w");
+    FILE *file = fopen("data/inscricoes.csv", "w");
     if (!file) {
         printf(RED "Erro ao salvar inscricoes!\n" RESET);
         return;
@@ -44,7 +44,7 @@ void salvarInscricoesCSV() {
 }
 
 void salvarFilaEsperaCSV() {
-    FILE *file = fopen("fila_espera.csv", "w");
+    FILE *file = fopen("data/fila_espera.csv", "w");
     if (!file) {
         printf(RED "Erro ao salvar fila de espera!\n" RESET);
         return;
@@ -67,7 +67,7 @@ void salvarTudoCSV() {
 // --- Funções de Carregamento ---
 
 void carregarEventosCSV() {
-    FILE *file = fopen("eventos.csv", "r");
+    FILE *file = fopen("data/eventos.csv", "r");
     if (!file) return;
 
     char linha[MAX * 4 + 20];
@@ -117,7 +117,7 @@ void carregarEventosCSV() {
 }
 
 void carregarParticipantesCSV() {
-    FILE *file = fopen("participantes.csv", "r");
+    FILE *file = fopen("data/participantes.csv", "r");
     if (!file) return;
 
     char linha[MAX * 3 + 10];
@@ -155,7 +155,7 @@ void carregarParticipantesCSV() {
 }
 
 void carregarInscricoesCSV() {
-    FILE *file = fopen("inscricoes.csv", "r");
+    FILE *file = fopen("data/inscricoes.csv", "r");
     if (!file) return;
 
     char linha[MAX * 4 + 20];
@@ -212,7 +212,7 @@ void carregarInscricoesCSV() {
                     e->participantes->prox = p;
                     e->participantes = p; // Atualiza o "tail"
                 }
-                e->vagas--; // Decrementa a vaga, pois o participante foi adicionado
+
             }
         }
     }
@@ -220,7 +220,7 @@ void carregarInscricoesCSV() {
 }
 
 void carregarFilaEsperaCSV() {
-    FILE *file = fopen("fila_espera.csv", "r");
+    FILE *file = fopen("data/fila_espera.csv", "r");
     if (!file) return;
 
     char linha[MAX + 10];
