@@ -5,8 +5,8 @@
 #include "comum.h"       // Para as structs e variáveis globais
 #include "utils.h"       // Para limparBuffer e validarEmail (usado indiretamente no carregamento)
 #include "participantes.h" // Para hashParticipante (usado no carregamento de participantes)
-#include "inscricoes.h"    // Para insereParticipante (usado no carregamento de inscrições)
-#include "eventos.h"     // Para atualizarIndice (chamado após carregar tudo)
+#include "inscricoes.h"
+#include "eventos.h"
 
 
 // Protótipos das funções de salvamento

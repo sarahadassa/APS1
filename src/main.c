@@ -1,11 +1,10 @@
-// main.c
 #include "comum.h"
 #include "Utils/utils.h"
-#include "Evento/eventos.h" // Corrigido para "eventos.h" se for esse o nome do arquivo
+#include "Evento/eventos.h" 
 #include "Participantes/participantes.h"
 #include "Inscricoes/inscricoes.h"
-#include "FilaPilha/filaPilha.h" // Corrigido para "filaPilha.h" se for esse o nome
-#include "Persistencia/persist.h" // Corrigido para "persist.h" se for esse o nome
+#include "FilaPilha/filaPilha.h" 
+#include "Persistencia/persist.h"
 
 // Variáveis globais (DEFINIDAS aqui, declaradas como extern em comum.h)
 Evento *eventos = NULL;
